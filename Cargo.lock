@@ -878,6 +878,7 @@ dependencies = [
  "chrono",
  "rocket",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

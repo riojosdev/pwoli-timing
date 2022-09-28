@@ -14,7 +14,7 @@ mod my_date_format {
     use chrono::{DateTime, TimeZone, Utc};
     use serde::{self, Deserialize, Deserializer, Serializer};
 
-    const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S %Z";
+    const FORMAT: &str = "%Y-%m-%d %H:%M:%S %Z";
 
     pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -39,17 +39,17 @@ pub fn utc_from(time: &str, date: PathBuf) -> DateTime<Utc> {
     // ! handle the errors for PathBuf and wrong time format
     let timestamp = format!(
         "{} {}",
-        NaiveDate::parse_from_str(&date.to_str().unwrap(), "%d\\%m\\%Y")
+        NaiveDate::parse_from_str(date.to_str().unwrap(), "%d\\%m\\%Y")
             .ok()
             .unwrap(),
         NaiveTime::parse_from_str(&format!("{}:00", time), "%H:%M:%S")
             .ok()
             .unwrap()
     );
-    let utc_timestamp = Utc
+    
+
+    Utc
         .datetime_from_str(&timestamp, "%Y-%m-%d %H:%M:%S")
         .ok()
-        .unwrap();
-
-    utc_timestamp
+        .unwrap()
 }

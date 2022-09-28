@@ -1,32 +1,55 @@
 #[macro_use] extern crate rocket;
 use std::path::PathBuf;
 use chrono::prelude::*;
-// use rocket::serde::{Serialize, json::Json};
+use rocket::serde::{Serialize, json::Json};
 
 #[launch]
 fn launch() -> _ {
     rocket::build().mount("/", routes![index])
 }
 
-// #[derive(Serialize)]
-// #[serde(crate = "rocket::serde")]
-// struct Todo {
-//     do_by_time: Utc,
-//     task: String
-// }
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+struct Todo {
+    #[serde(with = "my_date_format")]
+    do_by_time: DateTime<Utc>,
+    task: String
+}
 
-// impl Todo {
-//     fn new(do_by_time: Utc, task: String) -> Self {
-//         Todo {
-//             do_by_time,
-//             task
-//         }
-//     }
-// }
+mod my_date_format {
+    use chrono::{DateTime, Utc, TimeZone};
+    use serde::{self, Deserialize, Serializer, Deserializer};
+
+    const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S %Z";
+
+    pub fn serialize<S>(
+        date: &DateTime<Utc>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = format!("{}", date.format(FORMAT));
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(
+        deserializer: D,
+    ) -> Result<DateTime<Utc>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+    }
+}
 
 #[get("/<task>/<time>/<date..>")]
-fn index(task: &str, time: &str, date: PathBuf) -> String {
-    format!("{} {}", task, utc_from(time, date))
+fn index(task: &str, time: &str, date: PathBuf) -> Json<Todo> {
+    Json(Todo {
+        do_by_time: utc_from(time, date),
+        task: task.to_string()
+    })
 }
 
 /// Converts time and date to Utc timestamp

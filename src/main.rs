@@ -5,10 +5,6 @@ use pwoli_timing::*;
 use rocket::serde::json::Json;
 use std::path::PathBuf;
 
-
-use std::fs::{self, OpenOptions};
-use std::io::Read;
-
 pub const PATH: &str = "timings.json";
 
 #[get("/<task>/<time>/<date..>")]
@@ -18,7 +14,7 @@ fn create(task: &str, time: &str, date: PathBuf) -> Json<Vec<Todo>> {
         task: task.to_string(),
     };
     let contents = add_to_json(PATH, data, None);
-    
+
     Json(contents)
 }
 

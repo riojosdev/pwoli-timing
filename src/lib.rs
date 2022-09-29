@@ -60,7 +60,7 @@ pub fn add_to_json(path: &str, data: Todo, id: Option<usize>) -> Vec<Todo> {
     // Appending/inserting Todo data to the json file's contents
     match id {
         Some(index) => json_contents[index] = data,
-        None => json_contents.push(data)
+        None => json_contents.push(data),
     };
     // Rewriting the entire data
     rewrite_json(path, &json_contents);
@@ -70,7 +70,7 @@ pub fn add_to_json(path: &str, data: Todo, id: Option<usize>) -> Vec<Todo> {
 
 pub fn get_todo(path: &str, id: usize) -> Json<Todo> {
     let mut json_contents: Vec<Todo> = get_all_todos(path);
-    
+
     Json(json_contents.remove(id))
 }
 

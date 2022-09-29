@@ -55,41 +55,39 @@ pub fn utc_from(time: &str, date: PathBuf) -> DateTime<Utc> {
 }
 
 /// Writes the Todo data to a json file
-pub fn add_to_json(path: &str, data: Todo) -> Vec<Todo> {
-    let mut file = OpenOptions::new()
-        .create(true)
-        .read(true)
-        .append(true)
-        .open(path)
-        .unwrap();
-
-    // Read json file contents
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    let mut json_contents: Vec<Todo> = serde_json::from_str(&contents).unwrap();
-
-    // Appending Todo data to the json file's contents
-    json_contents.push(data);
-
+pub fn add_to_json(path: &str, data: Todo, id: Option<usize>) -> Vec<Todo> {
+    let mut json_contents: Vec<Todo> = get_all_todos(path);
+    // Appending/inserting Todo data to the json file's contents
+    match id {
+        Some(index) => json_contents[index] = data,
+        None => json_contents.push(data)
+    };
     // Rewriting the entire data
-    fs::write(path, serde_json::to_string(&json_contents).unwrap()).unwrap();
+    rewrite_json(path, &json_contents);
 
     json_contents
 }
 
 pub fn get_todo(path: &str, id: usize) -> Json<Todo> {
+    let mut json_contents: Vec<Todo> = get_all_todos(path);
+    
+    Json(json_contents.remove(id))
+}
+
+pub fn get_all_todos(path: &str) -> Vec<Todo> {
     let mut file = OpenOptions::new()
         .create(true)
         .read(true)
         .append(true)
         .open(path)
         .unwrap();
-
     // Read json file contents
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
-    let mut json_contents: Vec<Todo> = serde_json::from_str(&contents).unwrap();
 
-    
-    Json(json_contents.remove(id))
+    serde_json::from_str(&contents).unwrap()
+}
+
+pub fn rewrite_json(path: &str, data: &Vec<Todo>) {
+    fs::write(path, serde_json::to_string(data).unwrap()).unwrap();
 }

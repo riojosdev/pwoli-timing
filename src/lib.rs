@@ -90,6 +90,6 @@ pub fn get_todo(path: &str, id: usize) -> Json<Todo> {
     file.read_to_string(&mut contents).unwrap();
     let mut json_contents: Vec<Todo> = serde_json::from_str(&contents).unwrap();
 
-    let data = Json(json_contents.remove(id));
-    data
+    
+    Json(json_contents.remove(id))
 }

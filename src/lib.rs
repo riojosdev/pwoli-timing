@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use rocket::serde::{Deserialize, Serialize};
+use rocket::serde::{Deserialize, Serialize, json::Json};
 use std::fs::{self, OpenOptions};
 use std::io::Read;
 use std::path::PathBuf;
@@ -75,4 +75,21 @@ pub fn add_to_json(path: &str, data: Todo) -> Vec<Todo> {
     fs::write(path, serde_json::to_string(&json_contents).unwrap()).unwrap();
 
     json_contents
+}
+
+pub fn get_todo(path: &str, id: usize) -> Json<Todo> {
+    let mut file = OpenOptions::new()
+        .create(true)
+        .read(true)
+        .append(true)
+        .open(path)
+        .unwrap();
+
+    // Read json file contents
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    let mut json_contents: Vec<Todo> = serde_json::from_str(&contents).unwrap();
+
+    let data = Json(json_contents.remove(id));
+    data
 }

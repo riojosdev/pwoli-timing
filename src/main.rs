@@ -34,7 +34,16 @@ fn update(id: usize, task: &str, time: &str, date: PathBuf) -> Json<Todo> {
     Json(json_contents.remove(id))
 }
 
+#[get("/<id>/delete")]
+fn delete(id: usize) -> Json<Vec<Todo>> {
+    let mut json_contents = get_all_todos(PATH);
+    json_contents.remove(id);
+    rewrite_json(PATH, &json_contents);
+
+    Json(json_contents)
+}
+
 #[launch]
 fn launch() -> _ {
-    rocket::build().mount("/", routes![create, read, update])
+    rocket::build().mount("/", routes![create, read, update, delete])
 }

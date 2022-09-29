@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use rocket::serde::{Deserialize, Serialize, json::Json};
+use rocket::serde::{json::Json, Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
 use std::io::Read;
 use std::path::PathBuf;
